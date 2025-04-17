@@ -40,16 +40,16 @@
             );
         }
 
-        /* 指针样式 */
+	 /* 修正后的指针样式 */
         .pointer {
             position: absolute;
-            top: -25px;
+            top: -25px;    /* 调整上方间距 */
             left: 50%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             background: #000;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            transform: translateX(-50%);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);  /* 原始朝下三角形 */
+            transform: translateX(-50%) rotate(180deg);      /* 添加180度旋转 */
             z-index: 2;
         }
 
