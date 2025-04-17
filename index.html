@@ -40,16 +40,17 @@
             );
         }
 
-	 /* 修正后的指针样式 */
+
+        /* 修正指针定位 */
         .pointer {
             position: absolute;
-            top: -15px;    /* 调整上方间距 */
+            top: -2px;        /* 精准定位到转盘边缘 */
             left: 50%;
-            width: 25px;
+            width: 20px;
             height: 25px;
             background: #000;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);  /* 原始朝下三角形 */
-            transform: translateX(-50%) rotate(180deg);      /* 添加180度旋转 */
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%); /* 尖端朝下的三角形 */
+            transform: translateX(-50%);
             z-index: 2;
         }
 
@@ -177,7 +178,7 @@
             wheel.style.transform = `rotate(${totalRotation}deg)`;
 
             wheel.addEventListener('transitionend', () => {
-                const finalDegree = totalRotation % 360;
+		const finalDegree = (360 - (totalRotation % 360)) % 360;
                 let result;
                 
                 if (finalDegree < segments[0].max) {
