@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>今天撸不撸</title>
+    <style>
+        /* 基础样式保持不变 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+            margin: 20px 0;
+        }
+        .wheel-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 50px auto;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 3s ease-out;
+            cursor: pointer;
+            overflow: hidden;
+            background: conic-gradient(
+                #FF6B6B 0deg 108deg,
+                #4ECDC4 108deg 180deg,
+                #45B7D1 180deg 198deg,
+                #96CEB4 198deg 288deg,
+                #FFD93D 288deg 316.8deg,
+                #6C5B7B 316.8deg 352.8deg,
+                #FF9A00 352.8deg
+            );
+        }
+
+        /* 指针样式 */
+        .pointer {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background: #000;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        /* 精确文字定位系统 */
+        .label-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .label {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            width: 100px; /* 控制文字区域宽度 */
+            transform-origin: center center;
+        }
+
+        /* 通过计算实现精确定位 */
+        .label-1 { /* 撸一次 30% */
+            --start: 0deg;
+            --end: 108deg;
+            --center: calc((var(--start) + var(--end)) / 2);
+            font-size: 16px;
+        }
+        .label-2 { /* 撸两次 20% */
+            --start: 108deg;
+            --end: 180deg;
+            font-size: 16px;
+        }
+        .label-3 { /* 撸三次 5% */
+            --start: 180deg;
+            --end: 198deg;
+            font-size: 12px;
+        }
+        .label-4 { /* 不撸 25% */
+            --start: 198deg;
+            --end: 288deg;
+            font-size: 16px;
+        }
+        .label-5 { /* 只看不撸 8% */
+            --start: 288deg;
+            --end: 316.8deg;
+            font-size: 14px;
+        }
+        .label-6 { /* 只撸不看 10% */
+            --start: 316.8deg;
+            --end: 352.8deg;
+            font-size: 14px;
+        }
+        .label-7 { /* 撸到昏厥 2% */
+            --start: 352.8deg;
+            --end: 360deg;
+            font-size: 12px;
+        }
+
+        /* 动态计算定位 */
+        .label {
+            --center: calc((var(--start) + var(--end)) / 2);
+            --radius: 120px; /* 文字距中心距离 */
+            --angle: calc(var(--center) - 90deg); /* 转换为极坐标角度 */
+            
+            left: calc(50% + var(--radius) * cos(var(--angle)));
+            top: calc(50% + var(--radius) * sin(var(--angle)));
+            transform: 
+                translate(-50%, -50%) 
+                rotate(calc(var(--center) - 90deg));
+        }
+    </style>
+</head>
+<body>
+    <h1>今天撸不撸</h1>
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel">
+            <div class="label-container">
+                <div class="label label-1">撸一次</div>
+                <div class="label label-2">撸两次</div>
+                <div class="label label-3">撸三次</div>
+                <div class="label label-4">不撸</div>
+                <div class="label label-5">只看不撸</div>
+                <div class="label label-6">只撸不看</div>
+                <div class="label label-7">撸到昏厥</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加CSS自定义属性计算支持
+        const style = document.createElement('style');
+        style.textContent = `
+            .label {
+                left: calc(50% + var(--radius) * cos(var(--angle)));
+                top: calc(50% + var(--radius) * sin(var(--angle)));
+            }
+        `;
+        document.head.appendChild(style);
+
+        // JavaScript部分保持不变
+        const wheel = document.querySelector('.wheel');
+        let isSpinning = false;
+        
+        const segments = [
+            {max: 108},   // 30%
+            {max: 180},   // 20%
+            {max: 198},   // 5%
+            {max: 288},   // 25%
+            {max: 316.8}, // 8%
+            {max: 352.8}, // 10%
+            {max: 360}    // 2%
+        ];
+
+        wheel.addEventListener('click', () => {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const spins = 3 + Math.floor(Math.random() * 3);
+            const randomDegree = Math.random() * 360;
+            const totalRotation = spins * 360 + randomDegree;
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+
+            wheel.addEventListener('transitionend', () => {
+                const finalDegree = totalRotation % 360;
+                let result;
+                
+                if (finalDegree < segments[0].max) {
+                    result = '撸一次！';
+                } else if (finalDegree < segments[1].max) {
+                    result = '撸两次！';
+                } else if (finalDegree < segments[2].max) {
+                    result = '撸三次！';
+                } else if (finalDegree < segments[3].max) {
+                    result = '不撸！';
+                } else if (finalDegree < segments[4].max) {
+                    result = '只看不撸！';
+                } else if (finalDegree < segments[5].max) {
+                    result = '只撸不看！';
+                } else {
+                    result = '撸到昏厥！';
+                }
+
+                alert('最终结果：' + result);
+                isSpinning = false;
+                
+                wheel.style.transition = 'none';
+                wheel.style.transform = `rotate(${finalDegree}deg)`;
+                setTimeout(() => {
+                    wheel.style.transition = 'transform 3s ease-out';
+                }, 10);
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
